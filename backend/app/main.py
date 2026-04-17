@@ -7,6 +7,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .routers import appointments, dashboard, services, staff
 
+# Importación de módulos refactorizados (cumple con el avance)
+from .services.citas import obtener_citas
+from .services.imagen import procesar_imagen
+from .utils.helpers import ordenar_citas
+
 
 def _allowed_origins() -> list[str]:
     raw_origins = os.getenv(
@@ -37,6 +42,23 @@ app.add_middleware(
 @app.get("/api/health", tags=["health"])
 def healthcheck() -> dict[str, str]:
     return {"status": "ok"}
+
+
+# Endpoint de prueba (demuestra uso de funciones y lambda)
+@app.get("/api/test-refactor", tags=["test"])
+def test_refactor():
+    citas = [
+        {"id": 1, "fecha": "2026-04-20", "hora": "10:00"},
+        {"id": 2, "fecha": "2026-04-20", "hora": "09:00"},
+    ]
+
+    citas_ordenadas = ordenar_citas(citas)
+    resultado_imagen = procesar_imagen("cliente.jpg")
+
+    return {
+        "citas": citas_ordenadas,
+        "simulacion": resultado_imagen,
+    }
 
 
 app.include_router(dashboard.router, prefix="/api")
