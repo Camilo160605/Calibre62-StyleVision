@@ -1,8 +1,7 @@
-"""Datos semilla para la actividad de la guia de la semana 5.
+"""Datos semilla del backend.
 
-Cada constante es una lista de diccionarios que simula tablas de una base de
-datos local. Esta estructura facilita recorrer registros con ciclos y generar
-reportes sin depender todavia de una base de datos real.
+Estas colecciones alimentan la logica principal del sistema y sirven de base
+para construir la matriz real de agenda usada en el dashboard.
 """
 
 from __future__ import annotations

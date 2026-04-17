@@ -1,8 +1,7 @@
 """Esquemas y validaciones del backend.
 
-En esta actividad de la guia de la semana 5 se usan modelos Pydantic para
-validar entradas y dejar claro que cada dato tiene una estructura esperada
-antes de entrar a las listas de diccionarios del sistema.
+Se agregan modelos para resumir una matriz real de agenda y una prueba simple
+de carga, manteniendo la validacion estructural del sistema.
 """
 
 from __future__ import annotations
@@ -15,9 +14,6 @@ AppointmentStatus = Literal["confirmed", "checkin", "pending"]
 StaffStatus = Literal["active", "off"]
 ServiceCategory = Literal["Corte", "Barba", "Combo", "Color", "Tratamiento"]
 
-# Los modelos BaseModel organizan la informacion de forma academica y
-# comprensible. `Field(...)` establece reglas de validacion para controlar
-# entradas incompletas o fuera de rango.
 
 class Service(BaseModel):
     id: int
@@ -81,7 +77,33 @@ class DashboardStats(BaseModel):
     activeProfessionals: int = Field(ge=0)
 
 
+class ScheduleMatrixSummary(BaseModel):
+    # Este modelo deja tipado el resumen de la matriz de agenda construida con
+    # listas de listas y recorrida mediante ciclos anidados.
+    staffVector: list[str]
+    timeVector: list[str]
+    matrix: list[list[str]]
+    rectangular: bool
+    totalSlots: int = Field(ge=0)
+    occupiedSlots: int = Field(ge=0)
+    freeSlots: int = Field(ge=0)
+    pendingSlots: int = Field(ge=0)
+    confirmedSlots: int = Field(ge=0)
+    checkinSlots: int = Field(ge=0)
+    busiestStaff: str
+    busiestTime: str
+
+
+class MatrixLoadTest(BaseModel):
+    simulatedRows: int = Field(ge=0)
+    simulatedColumns: int = Field(ge=0)
+    processedCells: int = Field(ge=0)
+    occupiedCellsDetected: int = Field(ge=0)
+
+
 class DashboardSummary(BaseModel):
     stats: DashboardStats
     appointments: list[Appointment]
     staff: list[StaffMember]
+    scheduleMatrix: ScheduleMatrixSummary
+    loadTest: MatrixLoadTest

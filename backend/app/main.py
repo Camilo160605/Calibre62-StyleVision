@@ -1,9 +1,4 @@
-"""Configuracion principal del backend FastAPI.
-
-Actividad correspondiente a la guia de la semana 5. Aqui se evidencia la
-manipulacion de cadenas con `split()` y `strip()` para procesar una lista de
-origenes permitidos almacenada en una variable de entorno.
-"""
+"""Configuracion principal del backend FastAPI."""
 
 from __future__ import annotations
 
@@ -14,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .routers import appointments, dashboard, services, staff
 
-# Importación de módulos refactorizados (cumple con el avance)
+# Importacion de modulos refactorizados (cumple con el avance)
 from .services.citas import obtener_citas
 from .services.imagen import procesar_imagen
 from .utils.helpers import ordenar_citas
