@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react'
 import Header from '../components/Header.jsx'
 import { getDashboard, getLocalDashboardSnapshot } from '../lib/api.js'
 
+/*
+  Actividad correspondiente a la guia de la semana 5.
+  El dashboard funciona como reporte general: toma colecciones de citas y
+  profesionales para mostrar indicadores y recorridos resumidos.
+*/
+
 const CSS = `
   .dash { flex:1; overflow-y:auto; }
   .dash-body { padding: 28px; display: flex; flex-direction: column; gap: 24px; }
@@ -129,6 +135,8 @@ export default function Dashboard() {
   useEffect(() => {
     let cancelled = false
 
+    // Se consulta un resumen general y luego se distribuye en bloques visuales
+    // para evidenciar como una coleccion puede convertirse en un reporte.
     getDashboard()
       .then((data) => {
         if (!cancelled) setSummary(data)
@@ -183,6 +191,8 @@ export default function Dashboard() {
                 <button className="sec-link">Ver todas →</button>
               </div>
               <div className="appt-list">
+                {/* Este recorrido genera el reporte de agenda usando una lista
+                    de objetos donde cada cita se procesa como un registro. */}
                 {todayAppts.map((appointment) => (
                   <div key={appointment.id} className="appt-row">
                     <div className="appt-av">{appointment.initials}</div>
@@ -208,6 +218,8 @@ export default function Dashboard() {
               </div>
               <div className="staff-panel">
                 <div className="staff-list">
+                  {/* Segundo reporte iterativo: se recorre la coleccion del
+                      equipo para resumir disponibilidad y calificacion. */}
                   {staff.map((member) => (
                     <div key={member.id} className="staff-row">
                       <div className="staff-av">

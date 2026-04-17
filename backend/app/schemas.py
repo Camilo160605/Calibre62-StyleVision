@@ -1,3 +1,10 @@
+"""Esquemas y validaciones del backend.
+
+En esta actividad de la guia de la semana 5 se usan modelos Pydantic para
+validar entradas y dejar claro que cada dato tiene una estructura esperada
+antes de entrar a las listas de diccionarios del sistema.
+"""
+
 from __future__ import annotations
 
 from typing import Literal
@@ -8,6 +15,9 @@ AppointmentStatus = Literal["confirmed", "checkin", "pending"]
 StaffStatus = Literal["active", "off"]
 ServiceCategory = Literal["Corte", "Barba", "Combo", "Color", "Tratamiento"]
 
+# Los modelos BaseModel organizan la informacion de forma academica y
+# comprensible. `Field(...)` establece reglas de validacion para controlar
+# entradas incompletas o fuera de rango.
 
 class Service(BaseModel):
     id: int

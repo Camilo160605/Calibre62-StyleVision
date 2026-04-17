@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react'
 import Header from '../components/Header.jsx'
 import { createStaff, getLocalStaffSnapshot, getStaff, updateStaffStatus } from '../lib/api.js'
 
+/*
+  Actividad correspondiente a la guia de la semana 5.
+  Aqui la lista de profesionales se recorre para generar tarjetas y para
+  actualizar estados individuales sin perder el resto de la coleccion.
+*/
+
 const CSS = `
   .team { flex:1; overflow-y:auto; }
   .team-body { padding:28px; display:flex; flex-direction:column; gap:24px; }
@@ -127,6 +133,8 @@ export default function Staff() {
   useEffect(() => {
     let cancelled = false
 
+    // Se obtiene la lista del equipo al cargar la vista. Esta consulta conserva
+    // el enfoque de colecciones que luego se recorren y actualizan.
     getStaff()
       .then((data) => {
         if (!cancelled) setStaff(data)
@@ -139,14 +147,28 @@ export default function Staff() {
   }, [])
 
   const save = async () => {
-    if (!form.name) return
-    const created = await createStaff(form)
+    const cleanName = form.name.trim()
+    const cleanRole = form.role.trim()
+    const cleanSpecialty = form.specialty.trim()
+
+    // Validacion minima para evitar registros vacios y mejorar la calidad del
+    // conjunto de datos usado como evidencia academica.
+    if (!cleanName || !cleanRole) return
+
+    const created = await createStaff({
+      name: cleanName,
+      role: cleanRole,
+      specialty: cleanSpecialty,
+    })
     setStaff(prev => [...prev, created])
     setModal(false); setForm({ name:'', role:'Barbero', specialty:'' })
   }
 
   const toggle = async (member) => {
     const nextStatus = member.status === 'active' ? 'off' : 'active'
+
+    // `map()` permite recorrer la lista completa y reemplazar solo el objeto
+    // cuyo identificador coincide con el profesional actualizado.
     const updated = await updateStaffStatus(member.id, nextStatus)
     setStaff(prev => prev.map(s => s.id === member.id ? updated : s))
   }
@@ -163,6 +185,8 @@ export default function Staff() {
           </div>
 
           <div className="team-grid fade-up2">
+            {/* Recorrido iterativo del equipo para construir una tarjeta por
+                cada profesional almacenado en la coleccion local. */}
             {staff.map(s => (
               <div key={s.id} className={`team-card ${s.status === 'active' ? 'active' : ''}`}>
                 <div className="tc-top">

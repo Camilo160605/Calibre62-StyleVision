@@ -1,3 +1,9 @@
+/*
+  Actividad complementaria de la guia de la semana 5.
+  Esta vista deja evidencia de ciclos `for` para dibujar patrones repetitivos,
+  condicionales para controlar fases del flujo y manejo de errores con
+  `try/catch` durante la deteccion facial y el acceso a la camara.
+*/
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Navigate } from "react-router-dom";
 

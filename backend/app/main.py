@@ -1,3 +1,10 @@
+"""Configuracion principal del backend FastAPI.
+
+Actividad correspondiente a la guia de la semana 5. Aqui se evidencia la
+manipulacion de cadenas con `split()` y `strip()` para procesar una lista de
+origenes permitidos almacenada en una variable de entorno.
+"""
+
 from __future__ import annotations
 
 import os
@@ -13,7 +20,16 @@ def _allowed_origins() -> list[str]:
         "ALLOWED_ORIGINS",
         "http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173,http://127.0.0.1:4173",
     )
-    return [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
+    origins: list[str] = []
+
+    # `split(",")` separa el texto largo en elementos individuales y `strip()`
+    # elimina espacios sobrantes antes de guardar cada origen en la lista final.
+    for origin in raw_origins.split(","):
+        cleaned_origin = origin.strip()
+        if cleaned_origin:
+            origins.append(cleaned_origin)
+
+    return origins
 
 
 app = FastAPI(

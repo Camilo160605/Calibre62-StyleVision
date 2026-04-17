@@ -1,5 +1,11 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 
+/*
+  Actividad correspondiente a la guia de la semana 5.
+  Este componente evidencia un menu iterativo: una lista de objetos define las
+  opciones y luego se recorre con `map()` para construir la navegacion.
+*/
+
 const CSS = `
   .sidebar {
     width: 220px;
@@ -207,6 +213,8 @@ export default function Sidebar() {
         </div>
 
         <nav className="sb-nav">
+          {/* El menu se genera recorriendo una coleccion de grupos y luego la
+              subcoleccion de items. Este flujo iterativo evita repetir codigo. */}
           {NAV.map(group => (
             <div key={group.section}>
               <div className="sb-section">{group.section}</div>

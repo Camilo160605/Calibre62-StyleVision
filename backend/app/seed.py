@@ -1,5 +1,15 @@
+"""Datos semilla para la actividad de la guia de la semana 5.
+
+Cada constante es una lista de diccionarios que simula tablas de una base de
+datos local. Esta estructura facilita recorrer registros con ciclos y generar
+reportes sin depender todavia de una base de datos real.
+"""
+
 from __future__ import annotations
 
+# Lista de diccionarios que representa al equipo de trabajo. Cada diccionario
+# conserva campos con nombre explicito para que la informacion sea mas clara
+# que una lista simple basada en posiciones.
 SEED_STAFF = [
     {
         "id": 1,
@@ -43,6 +53,8 @@ SEED_STAFF = [
     },
 ]
 
+# Lista de diccionarios para el catalogo de servicios. Esta coleccion se usa
+# despues en recorridos de datos, filtros y calculos del dashboard.
 SEED_SERVICES = [
     {"id": 1, "name": "Corte Clasico", "category": "Corte", "price": 35000, "duration": 30, "popular": True},
     {"id": 2, "name": "Fade + Diseno", "category": "Corte", "price": 50000, "duration": 45, "popular": True},
@@ -56,6 +68,8 @@ SEED_SERVICES = [
     {"id": 10, "name": "Pompadour Premium", "category": "Corte", "price": 60000, "duration": 50, "popular": False},
 ]
 
+# Lista de diccionarios para la agenda diaria. Sirve como base para evidenciar
+# procesos iterativos de consulta, actualizacion y generacion de reportes.
 SEED_APPOINTMENTS = [
     {
         "id": 1,

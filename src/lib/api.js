@@ -1,11 +1,22 @@
 import { APPOINTMENTS, SERVICES, STAFF } from '../data/mock.js'
 
+/*
+  Actividad correspondiente a la guia de la semana 5.
+  Este modulo centraliza el acceso a datos y deja evidencia de:
+  - listas de objetos como simulacion de base de datos local
+  - transformacion de cadenas con split(), join() y replace()
+  - validacion basica de entradas antes de persistir informacion
+  - manejo de errores con try/catch para activar el modo fallback
+*/
+
 const API_BASE_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '')
 
 const clone = (value) => JSON.parse(JSON.stringify(value))
 
+const normalizeTextValue = (value = '') => value.replace(/\s+/g, ' ').trim()
+
 const initialsFromName = (name = '') =>
-  name
+  normalizeTextValue(name)
     .split(' ')
     .filter(Boolean)
     .slice(0, 2)
@@ -15,9 +26,15 @@ const initialsFromName = (name = '') =>
 
 const normalizeStaffMember = (member) => ({
   ...member,
+  name: normalizeTextValue(member.name),
+  role: normalizeTextValue(member.role),
+  specialty: normalizeTextValue(member.specialty),
   initials: member.initials || member.avatar || initialsFromName(member.name),
 })
 
+// Estas listas de objetos funcionan como una base de datos local sencilla.
+// Cada objeto conserva pares clave:valor equivalentes al uso academico de
+// diccionarios para representar entidades con varios atributos.
 const fallbackState = {
   appointments: APPOINTMENTS.map((appointment) => ({ ...appointment })),
   services: SERVICES.map((service) => ({ ...service })),
@@ -50,6 +67,8 @@ async function request(path, options = {}) {
 }
 
 function getFallbackDashboard() {
+  // Se construye un indice clave:valor para consultar precios por nombre sin
+  // recorrer la lista completa de servicios cada vez que se procesa una cita.
   const servicePrices = Object.fromEntries(fallbackState.services.map((service) => [service.name, service.price]))
   const todayRevenue = fallbackState.appointments.reduce(
     (total, appointment) => total + (servicePrices[appointment.service] || 0),
@@ -77,8 +96,14 @@ function getFallbackDashboard() {
   }
 }
 
-function withFallback(remoteCall, fallbackCall) {
-  return remoteCall().catch(() => fallbackCall())
+async function withFallback(remoteCall, fallbackCall) {
+  // `try/catch` permite mantener funcional la interfaz aunque la API remota
+  // falle. Si ocurre un error, el sistema continua con los datos locales.
+  try {
+    return await remoteCall()
+  } catch (error) {
+    return fallbackCall(error)
+  }
 }
 
 export function getLocalDashboardSnapshot() {
@@ -138,16 +163,21 @@ export function getServices() {
 }
 
 export function createService(payload) {
+  const normalizedPayload = {
+    ...payload,
+    name: normalizeTextValue(payload.name),
+  }
+
   return withFallback(
     () =>
       request('/services', {
         method: 'POST',
-        body: JSON.stringify(payload),
+        body: JSON.stringify(normalizedPayload),
       }),
     () => {
       const service = {
         id: fallbackIds.service++,
-        ...payload,
+        ...normalizedPayload,
         popular: false,
       }
 
@@ -178,17 +208,24 @@ export function getStaff() {
 }
 
 export function createStaff(payload) {
+  const normalizedPayload = {
+    ...payload,
+    name: normalizeTextValue(payload.name),
+    role: normalizeTextValue(payload.role),
+    specialty: normalizeTextValue(payload.specialty),
+  }
+
   return withFallback(
     () =>
       request('/staff', {
         method: 'POST',
-        body: JSON.stringify(payload),
+        body: JSON.stringify(normalizedPayload),
       }),
     () => {
       const staffMember = {
         id: fallbackIds.staff++,
-        ...payload,
-        initials: initialsFromName(payload.name),
+        ...normalizedPayload,
+        initials: initialsFromName(normalizedPayload.name),
         status: 'active',
         clients: 0,
         rating: 5,

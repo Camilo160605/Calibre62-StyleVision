@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react'
 import Header from '../components/Header.jsx'
 import { createService, deleteService, getLocalServicesSnapshot, getServices } from '../lib/api.js'
 
+/*
+  Actividad correspondiente a la guia de la semana 5.
+  Esta vista organiza una lista de servicios, aplica filtros por categoria y
+  evidencia validacion de entradas antes de agregar nuevos registros.
+*/
+
 const CSS = `
   .svc { flex:1; overflow-y:auto; }
   .svc-body { padding:28px; display:flex; flex-direction:column; gap:20px; }
@@ -143,6 +149,8 @@ export default function Services() {
   useEffect(() => {
     let cancelled = false
 
+    // Carga inicial del catalogo. El patron mantiene sincronizada la vista con
+    // la fuente de datos sin duplicar logica en varias partes del componente.
     getServices()
       .then((data) => {
         if (!cancelled) setServices(data)
@@ -154,16 +162,24 @@ export default function Services() {
     }
   }, [])
 
+  // El filtro conserva la lista completa o genera una sublista segun la
+  // categoria activa. Esta es una forma comun de recorrido sobre colecciones.
   const filtered = cat === 'Todas' ? services : services.filter(s => s.category === cat)
 
   const save = async () => {
-    if (!form.name || !form.price) return
+    const cleanName = form.name.trim()
+    const priceValue = Number.parseInt(form.price, 10)
+    const durationValue = Number.parseInt(form.duration, 10)
+
+    // Validacion de entradas: se evita guardar un servicio sin nombre o con un
+    // precio invalido, manteniendo la coherencia de la informacion.
+    if (!cleanName || Number.isNaN(priceValue) || priceValue <= 0) return
 
     const created = await createService({
-      name: form.name,
+      name: cleanName,
       category: form.category,
-      price: parseInt(form.price, 10),
-      duration: parseInt(form.duration, 10) || 30,
+      price: priceValue,
+      duration: Number.isNaN(durationValue) || durationValue <= 0 ? 30 : durationValue,
     })
 
     setServices(prev => [...prev, created])
@@ -193,6 +209,8 @@ export default function Services() {
           </div>
 
           <div className="svc-grid fade-up2">
+            {/* Reporte visual generado al recorrer la coleccion filtrada de
+                servicios. Cada tarjeta representa un registro del catalogo. */}
             {filtered.map(s => (
               <div key={s.id} className={`svc-card ${s.popular ? 'popular' : ''}`}>
                 <div className="svc-cat-tag">

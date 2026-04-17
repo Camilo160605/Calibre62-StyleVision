@@ -2,6 +2,15 @@ import { useEffect, useState } from 'react'
 import Header from '../components/Header.jsx'
 import { getAppointments, getLocalAppointmentsSnapshot, updateAppointmentStatus } from '../lib/api.js'
 
+/*
+  Actividad correspondiente a la guia de la semana 5.
+  En esta vista se evidencian:
+  - listas de objetos para representar citas
+  - condicionales if / else para filtrar estados
+  - recorridos iterativos con filter() y map()
+  - procesamiento de cadenas con split() al mostrar el nombre del profesional
+*/
+
 const CSS = `
   .citas { flex:1; overflow-y:auto; }
   .citas-body { padding:28px; display:flex; flex-direction:column; gap:20px; }
@@ -210,6 +219,8 @@ export default function Appointments() {
   useEffect(() => {
     let cancelled = false
 
+    // Se consulta la lista de citas al iniciar la vista. El control booleano
+    // evita actualizar el estado si el componente ya no esta montado.
     getAppointments()
       .then((data) => {
         if (!cancelled) setAppts(data)
@@ -221,6 +232,8 @@ export default function Appointments() {
     }
   }, [])
 
+  // Este bloque usa una cadena de condicionales para decidir que registros
+  // deben quedar en el reporte visible segun el filtro seleccionado.
   const filtered = appts.filter(a => {
     if (filter === 'Todas')       return true
     if (filter === 'Confirmadas') return a.status === 'confirmed'
@@ -229,11 +242,16 @@ export default function Appointments() {
     return true
   })
 
+  // Se genera un subconjunto de la lista principal para mostrar solo las citas
+  // que aun pueden pasar por el flujo iterativo de check-in.
   const pendingCheckin = appts.filter(a => a.status === 'confirmed')
 
   const doCheckin = (appt) => {
     setSelected(appt)
     setModal('scanning')
+
+    // Este flujo simula una operacion asincrona y luego recorre la coleccion
+    // con `map()` para reemplazar unicamente el registro actualizado.
     window.setTimeout(async () => {
       const updated = await updateAppointmentStatus(appt.id, 'checkin')
       setAppts(prev => prev.map(a => a.id === appt.id ? updated : a))
@@ -294,6 +312,8 @@ export default function Appointments() {
                 </tr>
               </thead>
               <tbody>
+                {/* `map()` recorre toda la coleccion filtrada para construir el
+                    reporte tabular de citas visibles. */}
                 {filtered.map(a => (
                   <tr key={a.id}>
                     <td>
